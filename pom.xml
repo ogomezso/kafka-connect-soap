@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.ogomez.kafka.connect.soap</groupId>
+  <artifactId>kafka-connect-soap</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+  </properties>
+
+  <parent>
+    <groupId>com.github.jcustenborder.kafka.connect</groupId>
+    <artifactId>kafka-connect-parent</artifactId>
+    <version>2.6.1-1</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.github.jcustenborder.kafka.connect</groupId>
+      <artifactId>connect-utils</artifactId>
+      <version>0.4.162</version>
+    </dependency>
+  </dependencies>
+
+  <packaging>jar</packaging>
+
+  <scm>
+    <connection>scm:git:https://github.com/cjmatta/kafka-connect-sse.git</connection>
+    <developerConnection>scm:git:git@github.com:cjmatta/kafka-connect-sse.git</developerConnection>
+    <url>https://github.com/cjmatta/kafka-connect-sse</url>
+  </scm>
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/cjmatta/kafka-connect-sse/issues</url>
+  </issueManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <source>8</source>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>io.confluent</groupId>
+        <artifactId>kafka-connect-maven-plugin</artifactId>
+        <version>0.11.1</version>
+        <executions>
+          <execution>
+            <id>hub</id>
+            <goals>
+              <goal>kafka-connect</goal>
+            </goals>
+            <configuration>
+              <title>Kafka Connect SSE</title>
+              <documentationUrl>https://github.com/ogomez/kafka-connect-soap/blob/master/README.md</documentationUrl>
+              <description>A Kafka Connect source connector for SOAP Web Services</description>
+              <ownerUsername>ogomez</ownerUsername>
+              <ownerType>user</ownerType>
+              <ownerName>Oscar Gomez</ownerName>
+              <ownerUrl>https://github.com/ogomez</ownerUrl>
+              <supportUrl>https://github.com/ogomez/kafka-connect-soap/issues</supportUrl>
+              <supportSummary>Support provided through community involvement.</supportSummary>
+<!--              <logo>assets/HTML5_Badge_256.png</logo>-->
+              <componentTypes>
+                <componentType>source</componentType>
+              </componentTypes>
+              <tags>
+                <tag>SOAP</tag>
+                <tag>SOAP Web Services</tag>
+              </tags>
+              <excludes>
+                <exclude>org.reflections:reflections</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
+</project>
