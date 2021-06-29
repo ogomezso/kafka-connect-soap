@@ -30,13 +30,13 @@
   <packaging>jar</packaging>
 
   <scm>
-    <connection>scm:git:https://github.com/cjmatta/kafka-connect-sse.git</connection>
-    <developerConnection>scm:git:git@github.com:cjmatta/kafka-connect-sse.git</developerConnection>
-    <url>https://github.com/cjmatta/kafka-connect-sse</url>
+    <connection>scm:git:https://github.com/ogomezso/kafka-connect-soap.git</connection>
+    <developerConnection>scm:git:git@github.com:ogomezso/kafka-connect-soap.git</developerConnection>
+    <url>https://github.com/ogomezso/kafka-connect-soap</url>
   </scm>
   <issueManagement>
     <system>github</system>
-    <url>https://github.com/cjmatta/kafka-connect-sse/issues</url>
+    <url>https://github.com/ogomezso/kafka-connect-soap/issues</url>
   </issueManagement>
 
   <build>
@@ -60,13 +60,13 @@
             </goals>
             <configuration>
               <title>Kafka Connect SSE</title>
-              <documentationUrl>https://github.com/ogomez/kafka-connect-soap/blob/master/README.md</documentationUrl>
+              <documentationUrl>https://github.com/ogomezso/kafka-connect-soap/blob/master/README.md</documentationUrl>
               <description>A Kafka Connect source connector for SOAP Web Services</description>
               <ownerUsername>ogomez</ownerUsername>
               <ownerType>user</ownerType>
               <ownerName>Oscar Gomez</ownerName>
-              <ownerUrl>https://github.com/ogomez</ownerUrl>
-              <supportUrl>https://github.com/ogomez/kafka-connect-soap/issues</supportUrl>
+              <ownerUrl>https://github.com/ogomezso</ownerUrl>
+              <supportUrl>https://github.com/ogomezso/kafka-connect-soap/issues</supportUrl>
               <supportSummary>Support provided through community involvement.</supportSummary>
 <!--              <logo>assets/HTML5_Badge_256.png</logo>-->
               <componentTypes>
