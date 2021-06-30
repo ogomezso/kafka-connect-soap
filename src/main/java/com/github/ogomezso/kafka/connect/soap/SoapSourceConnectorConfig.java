@@ -26,6 +26,7 @@ import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyBuilder;
 public class SoapSourceConnectorConfig extends AbstractConfig {
 
   public static final String ENDPOINT_URL = "endpointUrl";
+  public static final String POLL_INTERVAL_SECONDS = "pollTime";
   public static final String PORT_NAME = "portName";
   public static final String REQUEST_MSG_FILE = "requestMessageFile";
   public static final String SERVICE_NAME = "serviceName";
@@ -33,6 +34,7 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
   public static final String TARGET_NAMESPACE = "targetNameSpace";
   public static final String TOPIC = "topic";
   private static final String ENDPOINT_URL_DOC = "Endpoint url for a service";
+  private static final String POLL_INTERVAL_SECONDS_DOC = "Time between service calls in seconds";
   private static final String PORT_NAME_DOC = "Port Name for a service";
   private static final String REQUEST_MSG_FILE_DOC = "Absolute path to xml file containing the service message";
   private static final String SERVICE_NAME_DOC = "Service Name for SOAP will be invoked";
@@ -71,6 +73,12 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
         .define(
             ConfigKeyBuilder.of(PORT_NAME, Type.STRING)
                 .documentation(PORT_NAME_DOC)
+                .importance(Importance.HIGH)
+                .build()
+        )
+        .define(
+            ConfigKeyBuilder.of(POLL_INTERVAL_SECONDS, Type.LONG)
+                .documentation(POLL_INTERVAL_SECONDS_DOC)
                 .importance(Importance.HIGH)
                 .build()
         )

@@ -26,9 +26,16 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 import java.io.FileInputStream;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class SoapClient {
 
+  private final ExecutorService executor = Executors.newFixedThreadPool(10);
 
   public SoapEvent start(SoapSourceConnectorConfig config) throws Exception {
 
@@ -37,10 +44,25 @@ public class SoapClient {
     QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.PORT_NAME));
     String endpointUrl = config.getString(SoapSourceConnectorConfig.ENDPOINT_URL);
-    String actionUrl = Optional.ofNullable(SoapSourceConnectorConfig.SOAP_ACTION).orElse("");
+    String actionUrl = Optional.of(SoapSourceConnectorConfig.SOAP_ACTION).orElse("");
 
-    SOAPMessage response = invoke(serviceName, portName, endpointUrl, actionUrl);
-    return null;
+    final Future<SOAPMessage> future = executor.submit((Callable<SOAPMessage>) () -> {
+      // get ws result
+      return invoke(serviceName, portName, endpointUrl, actionUrl);
+    });
+    try {
+      SOAPMessage result = future
+          .get(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS), TimeUnit.SECONDS);
+      return getSoapEventFromMessage(result);
+
+    } catch (TimeoutException te) {
+      throw te;
+    }
+  }
+
+  private SoapEvent getSoapEventFromMessage(SOAPMessage result) {
+
+    return new SoapEvent("id", "data");
   }
 
   public SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
