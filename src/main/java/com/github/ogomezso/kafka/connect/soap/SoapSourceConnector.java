@@ -14,43 +14,46 @@
 
 package com.github.ogomezso.kafka.connect.soap;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.IntStream.range;
+
 import java.util.List;
 import java.util.Map;
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
-import com.github.jcustenborder.kafka.connect.utils.config.TaskConfigs;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Description("Kafka Connect source connector for SOAP Services")
 @Title("Kafka Connect SOAP")
-public class SourceSoapConnector extends SourceConnector {
+@Slf4j
+public class SoapSourceConnector extends SourceConnector {
 
-  private static final Logger log = LoggerFactory.getLogger(SourceSoapConnector.class);
-  private SoapSourceConnectorConfig config;
   Map<String, String> settings;
 
   @Override
   public void start(Map<String, String> map) {
     log.info("Starting Server Sent Events Source Connector");
-    config = new SoapSourceConnectorConfig(map);
+    SoapSourceConnectorConfig config = new SoapSourceConnectorConfig(map);
     this.settings = map;
   }
 
   @Override
   public Class<? extends Task> taskClass() {
-    return null;
+    return SoapSourceTask.class;
   }
 
   @Override
-  public List<Map<String, String>> taskConfigs(int i) {
-    return TaskConfigs.single(this.settings);
+  public List<Map<String, String>> taskConfigs(int maxTasks) {
+    return range(0, maxTasks).boxed()
+        .map(__ -> settings)
+        .collect(toList());
   }
 
   @Override
@@ -61,7 +64,7 @@ public class SourceSoapConnector extends SourceConnector {
 
   @Override
   public ConfigDef config() {
-    return null;
+    return SoapSourceConnectorConfig.config();
   }
 
   @Override

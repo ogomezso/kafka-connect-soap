@@ -14,6 +14,7 @@
 
 package com.github.ogomezso.kafka.connect.soap;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,27 +23,54 @@ import org.apache.kafka.connect.source.SourceTask;
 
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 
-public class SourceSoapTask extends SourceTask  {
+import lombok.extern.slf4j.Slf4j;
 
-  SoapClient client;
+@Slf4j
+public class SoapSourceTask extends SourceTask {
+
+  SoapSourceConnectorConfig config;
+  SoapClient client = new SoapClient();
 
   @Override
   public String version() {
+
     return VersionUtil.version(this.getClass());
   }
 
   @Override
   public void start(Map<String, String> map) {
 
+    log.info("Starting SOAP Source Task");
+    this.config = new SoapSourceConnectorConfig(map);
+
   }
 
   @Override
-  public List<SourceRecord> poll() throws InterruptedException {
-    return null;
+  public List<SourceRecord> poll() {
+    Record record = client.start(config);
+
+    return Collections.singletonList(createSourceRecordFromSseEvent(record));
+  }
+
+  private SourceRecord createSourceRecordFromSseEvent(Record event) {
+    Map<String, ?> srcOffset = Collections.emptyMap();
+    Map<String, ?> srcPartition = Collections.emptyMap();
+
+    log.debug("Event " + event.toString());
+    return new SourceRecord(
+        srcPartition,
+        srcOffset,
+        this.config.getString(SoapSourceConnectorConfig.TOPIC),
+        null,
+        null,
+        Record.SCHEMA,
+        event
+    );
+
   }
 
   @Override
   public void stop() {
-
+    client.stop();
   }
 }

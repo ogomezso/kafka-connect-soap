@@ -15,92 +15,80 @@
 package com.github.ogomezso.kafka.connect.soap;
 
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 import java.io.FileInputStream;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class SoapClient {
 
-  private final ExecutorService executor = Executors.newFixedThreadPool(10);
+  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
+  private final RecordMapper mapper = new RecordMapper();
 
-  public SoapEvent start(SoapSourceConnectorConfig config) throws Exception {
-
+  @SneakyThrows
+  public Record start(SoapSourceConnectorConfig config) {
     QName serviceName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.SERVICE_NAME));
     QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.PORT_NAME));
     String endpointUrl = config.getString(SoapSourceConnectorConfig.ENDPOINT_URL);
     String actionUrl = Optional.of(SoapSourceConnectorConfig.SOAP_ACTION).orElse("");
+    String pathToMessage = config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILE);
 
-    final Future<SOAPMessage> future = executor.submit((Callable<SOAPMessage>) () -> {
-      // get ws result
-      return invoke(serviceName, portName, endpointUrl, actionUrl);
-    });
-    try {
-      SOAPMessage result = future
-          .get(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS), TimeUnit.SECONDS);
-      return getSoapEventFromMessage(result);
+    Callable<SOAPMessage> invokeSoap = () -> invoke(serviceName, portName, endpointUrl, actionUrl,
+        pathToMessage);
 
-    } catch (TimeoutException te) {
-      throw te;
-    }
-  }
+    ScheduledFuture<SOAPMessage> future = executor
+        .schedule(invokeSoap, config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS),
+            TimeUnit.SECONDS);
 
-  private SoapEvent getSoapEventFromMessage(SOAPMessage result) {
-
-    return new SoapEvent("id", "data");
+    log.info("invonking at: " + LocalDateTime.now());
+    SOAPMessage result = future
+        .get(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS) + 5L,
+            TimeUnit.SECONDS);
+    log.info("result: " + result.toString());
+    log.info("get future at : " + LocalDateTime.now());
+    return mapper.getRecordFromSoapMessage(result);
   }
 
   public SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
-      String soapActionUri) throws Exception {
-    /** Create a service and add at least one port to it. **/
+      String soapActionUri, String pathToMessage) throws Exception {
     Service service = Service.create(serviceName);
     service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointUrl);
 
-    /** Create a Dispatch instance from a service.**/
     Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
         SOAPMessage.class, Service.Mode.MESSAGE);
-
-    // The soapActionUri is set here. otherwise we get a error on .net based services.
     dispatch.getRequestContext().put(Dispatch.SOAPACTION_USE_PROPERTY, Boolean.TRUE);
     dispatch.getRequestContext().put(Dispatch.SOAPACTION_URI_PROPERTY, soapActionUri);
 
-    /** Create SOAPMessage request. **/
-    // compose a request message
     MessageFactory messageFactory = MessageFactory.newInstance();
     SOAPMessage message = messageFactory.createMessage();
-
-    //Create objects for the message parts
     SOAPPart soapPart = message.getSOAPPart();
-    SOAPEnvelope envelope = soapPart.getEnvelope();
-    SOAPBody body = envelope.getBody();
-
-    //Populate the Message.  In here, I populate the message from a xml file
     StreamSource preppedMsgSrc = new StreamSource(new FileInputStream(
-        "/Users/ogomezsoriano/projects/confluent/kafka-connect-soap/src/main/resources/req.xml"));
+        pathToMessage));
     soapPart.setContent(preppedMsgSrc);
-
-    //Save the message
     message.saveChanges();
 
-    System.out.println(message.getSOAPBody().getFirstChild().getTextContent());
-
-    SOAPMessage response = (SOAPMessage) dispatch.invoke(message);
-
-    return response;
+    return dispatch.invoke(message);
   }
+
+  public void stop() {
+    executor.shutdown();
+  }
+
 }

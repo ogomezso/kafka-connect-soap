@@ -21,8 +21,6 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 
-import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyBuilder;
-
 public class SoapSourceConnectorConfig extends AbstractConfig {
 
   public static final String ENDPOINT_URL = "endpointUrl";
@@ -44,6 +42,7 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
 
   private final String enpointUrl;
   private final String portName;
+  private final Long pollIntervalSeconds;
   private final String requestMsgFile;
   private final String serviceName;
   private final String soapAction;
@@ -52,65 +51,26 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
 
   public SoapSourceConnectorConfig(Map<?, ?> originals) {
     super(config(), originals);
-    this.enpointUrl = this.getString(ENDPOINT_URL);
-    this.portName = this.getString(PORT_NAME);
-    this.requestMsgFile = this.getString(REQUEST_MSG_FILE);
-    this.serviceName = this.getString(SERVICE_NAME);
-    this.soapAction = this.getString(SOAP_ACTION);
-    this.targetNameSpace = this.getString(TARGET_NAMESPACE);
-    this.topic = this.getString(TOPIC);
+    enpointUrl = this.getString(ENDPOINT_URL);
+    portName = this.getString(PORT_NAME);
+    pollIntervalSeconds = this.getLong(POLL_INTERVAL_SECONDS);
+    requestMsgFile = this.getString(REQUEST_MSG_FILE);
+    serviceName = this.getString(SERVICE_NAME);
+    soapAction = this.getString(SOAP_ACTION);
+    targetNameSpace = this.getString(TARGET_NAMESPACE);
+    topic = this.getString(TOPIC);
   }
 
   public static ConfigDef config() {
 
     return new ConfigDef()
-        .define(
-            ConfigKeyBuilder.of(ENDPOINT_URL, Type.STRING)
-                .documentation(ENDPOINT_URL_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(PORT_NAME, Type.STRING)
-                .documentation(PORT_NAME_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(POLL_INTERVAL_SECONDS, Type.LONG)
-                .documentation(POLL_INTERVAL_SECONDS_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(REQUEST_MSG_FILE, Type.STRING)
-                .documentation(REQUEST_MSG_FILE_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(SERVICE_NAME, Type.STRING)
-                .documentation(SERVICE_NAME_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(SOAP_ACTION, Type.STRING)
-                .documentation(SOAP_ACTION_DOC)
-                .importance(Importance.LOW)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(TARGET_NAMESPACE, Type.STRING)
-                .documentation(TARGET_NAMESPACE_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        )
-        .define(
-            ConfigKeyBuilder.of(TOPIC, Type.STRING)
-                .documentation(TOPIC_DOC)
-                .importance(Importance.HIGH)
-                .build()
-        );
+        .define(ENDPOINT_URL, Type.STRING, "", Importance.HIGH, ENDPOINT_URL_DOC)
+        .define(PORT_NAME, Type.STRING, "", Importance.HIGH, PORT_NAME_DOC)
+        .define(POLL_INTERVAL_SECONDS, Type.LONG, 0, Importance.HIGH, POLL_INTERVAL_SECONDS_DOC)
+        .define(REQUEST_MSG_FILE, Type.STRING, "", Importance.HIGH, REQUEST_MSG_FILE_DOC)
+        .define(SERVICE_NAME, Type.STRING, "", Importance.HIGH, SERVICE_NAME_DOC)
+        .define(SOAP_ACTION, Type.STRING, "", Importance.HIGH, SOAP_ACTION_DOC)
+        .define(TARGET_NAMESPACE, Type.STRING, "", Importance.HIGH, TARGET_NAMESPACE_DOC)
+        .define(TOPIC, Type.STRING, "", Importance.HIGH, TOPIC_DOC);
   }
 }

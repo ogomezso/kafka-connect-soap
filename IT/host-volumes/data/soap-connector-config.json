@@ -1,0 +1,14 @@
+{
+  "name": "soap-country-source",
+  "config": {
+    "connector.class": "com.github.ogomezso.kafka.connect.soap.SoapSourceConnector",
+    "tasks.max": 1,
+    "endpointUrl": "http://wiremock:8080/mockCountries",
+    "pollTime": 20,
+    "portName": "CountriesPortSoap11",
+    "requestMessageFile": "/home/appuser/data/getCountryRequest.xml",
+    "serviceName": "CountriesPortService",
+    "targetNameSpace": "http://www.baeldung.com/springsoap/gen",
+    "topic": "soap.test"
+  }
+}

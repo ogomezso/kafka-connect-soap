@@ -18,29 +18,18 @@ import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
 
-public class SoapEvent extends Struct {
+public class Record extends Struct {
 
-  public static final String ID = "id";
   public static final String DATA = "data";
 
   final public static Schema SCHEMA = SchemaBuilder.struct()
-      .name("com.github.ogomezso.kafka.connect.soap.SoapEvent")
-      .doc("Server Sent Event Message")
-      .field(ID, SchemaBuilder.string().doc("The event ID").optional().build())
+      .name("com.github.ogomezso.kafka.connect.soap.Record")
+      .doc("Soap Message from ")
       .field(DATA, SchemaBuilder.string().doc("The event data payload").required().build());
 
-  public SoapEvent(String id, String data) {
+  public Record(String data) {
     super(SCHEMA);
     this
-        .put(ID, id)
         .put(DATA, data);
-  }
-
-  @Override
-  public String toString() {
-    return String.format("[id]=%s [data]=%s",
-        this.get(ID),
-        this.get(DATA)
-    );
   }
 }
