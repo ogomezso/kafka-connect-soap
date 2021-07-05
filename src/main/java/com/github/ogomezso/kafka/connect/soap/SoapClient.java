@@ -40,8 +40,10 @@ public class SoapClient {
   private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
   private final RecordMapper mapper = new RecordMapper();
 
+  private Callable<SOAPMessage> task;
+
   @SneakyThrows
-  public Record start(SoapSourceConnectorConfig config) {
+  public void start(SoapSourceConnectorConfig config) {
     QName serviceName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.SERVICE_NAME));
     QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
@@ -50,16 +52,19 @@ public class SoapClient {
     String actionUrl = Optional.of(SoapSourceConnectorConfig.SOAP_ACTION).orElse("");
     String pathToMessage = config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILE);
 
-    Callable<SOAPMessage> invokeSoap = () -> invoke(serviceName, portName, endpointUrl, actionUrl,
+    this.task = () -> invoke(serviceName, portName, endpointUrl, actionUrl,
         pathToMessage);
+  }
 
+  @SneakyThrows
+  public Record poll(Long pollInterval) {
     ScheduledFuture<SOAPMessage> future = executor
-        .schedule(invokeSoap, config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS),
+        .schedule(task, pollInterval,
             TimeUnit.SECONDS);
 
     log.info("invonking at: " + LocalDateTime.now());
     SOAPMessage result = future
-        .get(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS) + 5L,
+        .get(pollInterval + 5L,
             TimeUnit.SECONDS);
     log.info("result: " + result.toString());
     log.info("get future at : " + LocalDateTime.now());

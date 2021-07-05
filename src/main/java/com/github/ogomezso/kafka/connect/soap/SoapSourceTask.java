@@ -43,11 +43,12 @@ public class SoapSourceTask extends SourceTask {
     log.info("Starting SOAP Source Task");
     this.config = new SoapSourceConnectorConfig(map);
 
+    client.start(config);
   }
 
   @Override
   public List<SourceRecord> poll() {
-    Record record = client.start(config);
+    Record record = client.poll(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS));
 
     return Collections.singletonList(createSourceRecordFromSseEvent(record));
   }
