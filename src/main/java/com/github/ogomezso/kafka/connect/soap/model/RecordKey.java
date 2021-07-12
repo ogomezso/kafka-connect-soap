@@ -12,24 +12,14 @@
  * the License.
  */
 
-package com.github.ogomezso.kafka.connect.soap;
+package com.github.ogomezso.kafka.connect.soap.model;
 
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.SchemaBuilder;
-import org.apache.kafka.connect.data.Struct;
+import lombok.Builder;
+import lombok.Data;
 
-public class Record extends Struct {
-
-  public static final String DATA = "data";
-
-  final public static Schema SCHEMA = SchemaBuilder.struct()
-      .name("com.github.ogomezso.kafka.connect.soap.Record")
-      .doc("Soap Message from ")
-      .field(DATA, SchemaBuilder.string().doc("The event data payload").required().build());
-
-  public Record(String data) {
-    super(SCHEMA);
-    this
-        .put(DATA, data);
-  }
+@Builder
+@Data
+public class RecordKey {
+  private String serviceName;
+  private String requestType;
 }

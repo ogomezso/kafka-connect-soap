@@ -12,40 +12,51 @@
  * the License.
  */
 
-package com.github.ogomezso.kafka.connect.soap;
+package com.github.ogomezso.kafka.connect.soap.model;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Map;
 
+import org.apache.kafka.connect.source.SourceRecord;
 import org.w3c.dom.Document;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RecordMapper {
+public class SourceRecordMapper {
 
   private final XmlMapper xmlMapper = new XmlMapper();
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
-  @SneakyThrows
-  public Record getRecordFromSoapMessage(SOAPMessage message) {
+  public SourceRecord getSourceRecordFromSoapMessage(RecordKey recordKey, SOAPMessage message,
+      String topic)
+      throws SOAPException, IOException, TransformerException {
 
-    String messageAsJsonString = messageToJsonString(message);
-    return new Record(messageAsJsonString);
+    log.debug("Record key: {}", recordKey);
+    String keyAsJsonString = jsonMapper.writeValueAsString(recordKey);
+    log.debug("Record key string: {}", keyAsJsonString);
+    String valueAsJsonString = valueToJsonString(message);
+    log.debug("Value string: {}", valueAsJsonString);
+    return createSourceRecordFromSoapEvent(new RecordKeyStruct(keyAsJsonString),
+        new RecordValueStruct(valueAsJsonString), topic);
   }
 
-  @SneakyThrows
-  private String messageToJsonString(SOAPMessage message) {
+  private String valueToJsonString(SOAPMessage message)
+      throws TransformerException, SOAPException, IOException {
     log.info("mapping");
     Document doc = message.getSOAPBody().extractContentAsDocument();
     StringWriter sw = new StringWriter();
@@ -58,5 +69,25 @@ public class RecordMapper {
     transformer.transform(new DOMSource(doc), new StreamResult(sw));
     JsonNode node = xmlMapper.readTree(sw.toString().getBytes());
     return jsonMapper.writeValueAsString(node);
+  }
+
+  private SourceRecord createSourceRecordFromSoapEvent(
+      RecordKeyStruct key,
+      RecordValueStruct value, String topic) {
+// TODO Add Support to full qualified AVRO Schemas
+    Map<String, ?> srcOffset = Collections.emptyMap();
+    Map<String, ?> srcPartition = Collections.emptyMap();
+
+    log.debug("Event " + value.toString());
+    return new SourceRecord(
+        srcPartition,
+        srcOffset,
+        topic,
+        RecordKeyStruct.SCHEMA,
+        key,
+        RecordValueStruct.SCHEMA,
+        value
+    );
+
   }
 }

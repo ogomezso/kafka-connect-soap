@@ -12,67 +12,73 @@
  * the License.
  */
 
-package com.github.ogomezso.kafka.connect.soap;
+package com.github.ogomezso.kafka.connect.soap.client;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
+import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
 
 import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
 import jakarta.xml.soap.SOAPPart;
 import jakarta.xml.ws.Dispatch;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.soap.SOAPBinding;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SoapClient {
 
-  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(10);
-  private final RecordMapper mapper = new RecordMapper();
+  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
 
   private Callable<SOAPMessage> task;
 
-  @SneakyThrows
+
   public void start(SoapSourceConnectorConfig config) {
     QName serviceName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.SERVICE_NAME));
     QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.PORT_NAME));
     String endpointUrl = config.getString(SoapSourceConnectorConfig.ENDPOINT_URL);
-    String actionUrl = Optional.of(SoapSourceConnectorConfig.SOAP_ACTION).orElse("");
-    String pathToMessage = config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILE);
+    String actionUrl = config.getString(SoapSourceConnectorConfig.SOAP_ACTION);
+    File messageFile = ConfigUtils
+        .getAbsoluteFile(config, SoapSourceConnectorConfig.REQUEST_MSG_FILE);
 
     this.task = () -> invoke(serviceName, portName, endpointUrl, actionUrl,
-        pathToMessage);
+        messageFile);
   }
 
-  @SneakyThrows
-  public Record poll(Long pollInterval) {
+  public SOAPMessage poll(Long pollInterval)
+      throws ExecutionException, InterruptedException, TimeoutException {
     ScheduledFuture<SOAPMessage> future = executor
         .schedule(task, pollInterval,
             TimeUnit.SECONDS);
 
-    log.info("invonking at: " + LocalDateTime.now());
+    log.debug("invonking at: " + LocalDateTime.now());
     SOAPMessage result = future
         .get(pollInterval + 5L,
             TimeUnit.SECONDS);
-    log.info("result: " + result.toString());
-    log.info("get future at : " + LocalDateTime.now());
-    return mapper.getRecordFromSoapMessage(result);
+    log.debug("result: " + result.toString());
+    log.debug("get future at : " + LocalDateTime.now());
+    return result;
   }
 
-  public SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
-      String soapActionUri, String pathToMessage) throws Exception {
+  private SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
+      String soapActionUri, File pathToMessage) throws SOAPException, FileNotFoundException {
     Service service = Service.create(serviceName);
     service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointUrl);
 

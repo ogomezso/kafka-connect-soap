@@ -47,6 +47,17 @@
       <version>1.18.20</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>3.7.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>3.7.7</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <packaging>jar</packaging>
@@ -90,7 +101,6 @@
               <ownerUrl>https://github.com/ogomezso</ownerUrl>
               <supportUrl>https://github.com/ogomezso/kafka-connect-soap/issues</supportUrl>
               <supportSummary>Support provided through community involvement.</supportSummary>
-<!--              <logo>assets/HTML5_Badge_256.png</logo>-->
               <componentTypes>
                 <componentType>source</componentType>
               </componentTypes>

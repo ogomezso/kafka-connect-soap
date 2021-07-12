@@ -1,7 +1,7 @@
 {
   "name": "soap-country-source",
   "config": {
-    "connector.class": "com.github.ogomezso.kafka.connect.soap.SoapSourceConnector",
+    "connector.class": "com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnector",
     "tasks.max": 1,
     "endpointUrl": "http://wiremock:8080/mockCountries",
     "pollTime": 20,
