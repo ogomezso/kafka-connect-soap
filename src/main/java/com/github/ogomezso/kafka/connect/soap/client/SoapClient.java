@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -31,6 +32,10 @@ import java.util.concurrent.TimeoutException;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPException;
 import jakarta.xml.soap.SOAPMessage;
@@ -43,12 +48,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SoapClient {
 
-  private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(4);
+
+  private static final int MAX_CORES_USED = Optional
+      .of(Runtime.getRuntime().availableProcessors() / 2)
+      .filter(cores -> !cores.equals(0))
+      .orElse(1);
+  private final ScheduledExecutorService executor = Executors
+      .newScheduledThreadPool(MAX_CORES_USED);
 
   private Callable<SOAPMessage> task;
 
 
   public void start(SoapSourceConnectorConfig config) {
+
     QName serviceName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
         config.getString(SoapSourceConnectorConfig.SERVICE_NAME));
     QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
@@ -57,33 +69,59 @@ public class SoapClient {
     String actionUrl = config.getString(SoapSourceConnectorConfig.SOAP_ACTION);
     File messageFile = ConfigUtils
         .getAbsoluteFile(config, SoapSourceConnectorConfig.REQUEST_MSG_FILE);
+    Long connectionTimeout = config.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT);
+    Long requestTimeout = config.getLong(SoapSourceConnectorConfig.REQUEST_TIMEOUT);
 
-    this.task = () -> invoke(serviceName, portName, endpointUrl, actionUrl,
-        messageFile);
+    CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
+        .failureRateThreshold(10)
+        .slidingWindow(connectionTimeout.intValue() * 3, 3, SlidingWindowType.TIME_BASED)
+        .build();
+
+    CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(circuitBreakerConfig);
+    CircuitBreaker circuitBreaker = registry.circuitBreaker("SoapTask");
+    this.task = CircuitBreaker
+        .decorateCallable(circuitBreaker, () -> {
+          SOAPMessage result = null;
+          try {
+            result = invoke(serviceName, portName, endpointUrl, actionUrl,
+                messageFile, connectionTimeout, requestTimeout);
+          } catch (SOAPException e) {
+            log.error("Error executing SOAP Call", e);
+          } catch (FileNotFoundException e) {
+            log.error("Request file not present", e);
+          }
+          return Optional.ofNullable(result)
+              .orElseThrow(() -> new RuntimeException("Unexpected Error fetching Service"));
+        });
   }
 
   public SOAPMessage poll(Long pollInterval)
       throws ExecutionException, InterruptedException, TimeoutException {
+
     ScheduledFuture<SOAPMessage> future = executor
         .schedule(task, pollInterval,
-            TimeUnit.SECONDS);
+            TimeUnit.MILLISECONDS);
 
     log.debug("invonking at: " + LocalDateTime.now());
     SOAPMessage result = future
-        .get(pollInterval + 5L,
-            TimeUnit.SECONDS);
+        .get(pollInterval + 5000L,
+            TimeUnit.MILLISECONDS);
     log.debug("result: " + result.toString());
     log.debug("get future at : " + LocalDateTime.now());
     return result;
   }
 
   private SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
-      String soapActionUri, File pathToMessage) throws SOAPException, FileNotFoundException {
+      String soapActionUri, File pathToMessage, Long connectionTimeout, Long requestTimeout)
+      throws SOAPException, FileNotFoundException {
     Service service = Service.create(serviceName);
     service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointUrl);
 
     Dispatch<SOAPMessage> dispatch = service.createDispatch(portName,
         SOAPMessage.class, Service.Mode.MESSAGE);
+    dispatch.getRequestContext()
+        .put("com.sun.xml.ws.connect.timeout", connectionTimeout.intValue());
+    dispatch.getRequestContext().put("com.sun.xml.ws.request.timeout", requestTimeout.intValue());
     dispatch.getRequestContext().put(Dispatch.SOAPACTION_USE_PROPERTY, Boolean.TRUE);
     dispatch.getRequestContext().put(Dispatch.SOAPACTION_URI_PROPERTY, soapActionUri);
 

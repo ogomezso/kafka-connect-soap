@@ -29,11 +29,15 @@ public class SourceTaskSettingMother {
   static final String REQUEST_FILE = "/homer/fakeuser/equest.xml";
   static final String KO_REQUEST_FILE = "request.xml";
   static final String TOPIC = "topic";
+  static final String CONNECTION_TIMEOUT = "3";
+  static final String KO_CONN_TIMEOUT = "6";
+
 
   static Map<String, String> createValidMockSettings() {
     return new HashMap<String, String>() {{
+      put(SoapSourceConnectorConfig.CONNECTION_TIMEOUT, CONNECTION_TIMEOUT);
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
@@ -45,7 +49,7 @@ public class SourceTaskSettingMother {
 
   static Map<String, String> createMissingEndpointUrlSpaceMockSettings() {
     return new HashMap<String, String>() {{
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
@@ -56,7 +60,21 @@ public class SourceTaskSettingMother {
   static Map<String, String> createKoPollMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, KO_POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, KO_POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
+      put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
+      put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
+      put(SoapSourceConnectorConfig.TOPIC, TOPIC);
+    }};
+  }
+
+  static Map<String, String> createKoConnTimeOutMockSettings() {
+    return new HashMap<String, String>() {{
+      put(SoapSourceConnectorConfig.CONNECTION_TIMEOUT, KO_CONN_TIMEOUT);
+      put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
@@ -69,7 +87,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createMissingPortNameMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
@@ -81,7 +99,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createMissingRequestFileMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
@@ -93,7 +111,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createKoRequestFileMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, KO_REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
@@ -106,7 +124,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createMissingServiceNameMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
@@ -118,7 +136,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createMissingTargetNameSpaceMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
@@ -130,7 +148,7 @@ public class SourceTaskSettingMother {
   static Map<String, String> createMissingTopicMockSettings() {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
-      put(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS, POLL_INTERVAL);
+      put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
       put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);

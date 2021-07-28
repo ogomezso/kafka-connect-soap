@@ -41,6 +41,7 @@ class SoapClientTest {
   private static final String SOAP_ACTION = "soapAction";
   private static final String REQUEST_FILE = "/homer/fakeuser/equest.xml";
   private static final String KO_REQUEST_FILE = "request.xml";
+  private static final Long CONNECTION_TIMEOUT = 5L;
 
   @InjectMocks
   private final SoapClient stubbedClassToTest = new SoapClient();
@@ -61,6 +62,8 @@ class SoapClientTest {
     when(mockConfig.getString(SoapSourceConnectorConfig.SOAP_ACTION)).thenReturn(SOAP_ACTION);
     when(mockConfig.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE))
         .thenReturn(TARGET_NAME_SPACE);
+    when(mockConfig.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT))
+        .thenReturn(CONNECTION_TIMEOUT);
 
     assertDoesNotThrow(() -> classToTest.start(mockConfig));
   }
@@ -83,7 +86,7 @@ class SoapClientTest {
   public void given_ok_poll_interval__when_poll_then_future_complete_ok() throws Exception {
 
     when(mockTask.call()).thenReturn(mockReturnMessage);
-    assertDoesNotThrow(() -> stubbedClassToTest.poll(5L));
+    assertDoesNotThrow(() -> stubbedClassToTest.poll(5000L));
   }
 
 }

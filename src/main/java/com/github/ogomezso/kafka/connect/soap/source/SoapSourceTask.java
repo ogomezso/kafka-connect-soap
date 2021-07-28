@@ -47,6 +47,7 @@ public class SoapSourceTask extends SourceTask {
   SoapSourceConnectorConfig config;
   SoapClient client = new SoapClient();
   private Long pollInterval;
+  private Long connectionTimeout;
   private String topic;
   private String serviceName;
   private File request;
@@ -60,7 +61,6 @@ public class SoapSourceTask extends SourceTask {
     this.request = request;
   }
 
-
   @Override
   public String version() {
     return VersionUtil.version(this.getClass());
@@ -68,7 +68,6 @@ public class SoapSourceTask extends SourceTask {
 
   @Override
   public void start(Map<String, String> map) {
-    log.info("Starting SOAP Source Task");
     config = new SoapSourceConnectorConfig(map);
     validateAndsSetConfigVars(config);
     client.start(config);
@@ -76,9 +75,12 @@ public class SoapSourceTask extends SourceTask {
 
   private void validateAndsSetConfigVars(SoapSourceConnectorConfig config) {
 
-    pollInterval = Optional.of(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL_SECONDS))
+    pollInterval = Optional.of(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL))
         .filter(p -> p > 0)
         .orElseThrow(() -> new ConfigException("Poll interval must be greater than 0"));
+    connectionTimeout = Optional.of(config.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT))
+        .filter(p -> (p > 0 && p < pollInterval))
+        .orElseThrow(() -> new ConfigException("Poll interval must be greater than connection timeout"));
     topic = Optional.ofNullable(this.config.getString(SoapSourceConnectorConfig.TOPIC))
         .orElseThrow(() -> new ConfigException("Topic can't be null"));
     request = ConfigUtils.getAbsoluteFile(config, SoapSourceConnectorConfig.REQUEST_MSG_FILE);

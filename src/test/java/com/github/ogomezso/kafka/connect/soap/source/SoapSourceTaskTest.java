@@ -46,6 +46,12 @@ class SoapSourceTaskTest {
   }
 
   @Test
+  public void given_conn_time_out_greater_than_poll_interval_when_start_task_then_throws_config_exception() {
+    Map<String, String> mockedSettings = SourceTaskSettingMother.createKoConnTimeOutMockSettings();
+    assertThrows(ConfigException.class, () -> classToTest.start(mockedSettings));
+  }
+
+  @Test
   public void given_missing_port_name_when_start_task_then_throws_config_exception() {
     Map<String, String> mockedSettings = SourceTaskSettingMother
         .createMissingPortNameMockSettings();
