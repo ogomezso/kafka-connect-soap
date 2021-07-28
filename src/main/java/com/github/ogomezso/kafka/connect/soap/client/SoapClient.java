@@ -29,6 +29,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.pool2.impl.GenericObjectPool;
+
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
 
@@ -72,6 +74,12 @@ public class SoapClient {
     Long connectionTimeout = config.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT);
     Long requestTimeout = config.getLong(SoapSourceConnectorConfig.REQUEST_TIMEOUT);
 
+    createCircuitBreakerTask(serviceName, portName, endpointUrl, actionUrl, messageFile, connectionTimeout,
+        requestTimeout);
+  }
+
+  private void createCircuitBreakerTask(QName serviceName, QName portName, String endpointUrl, String actionUrl,
+      File messageFile, Long connectionTimeout, Long requestTimeout) {
     CircuitBreakerConfig circuitBreakerConfig = CircuitBreakerConfig.custom()
         .failureRateThreshold(10)
         .slidingWindow(connectionTimeout.intValue() * 3, 3, SlidingWindowType.TIME_BASED)
