@@ -16,13 +16,11 @@
 
 package com.github.ogomezso.kafka.connect.soap.source;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.File;
+import java.util.*;
 
 import org.apache.kafka.common.config.ConfigDef;
-//import org.apache.kafka.common.config.ConfigException;
+import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
 
@@ -55,26 +53,23 @@ public class SoapSourceConnector extends SourceConnector {
 
   @Override
   public List<Map<String, String>> taskConfigs(int maxTasks) {
-    //TODO Allow a list of request files.
     // Every task will receive one file as config.
     // Every request must be handled by its own task so max tasks must be the number of request records.
-    //   if (maxTasks != 1) {
-    //     throw new ConfigException("Task must be exactly one");
-    //   }
 
-    // Separate Task Config from Source Config.
     ArrayList<Map<String, String>> taskConfigs = new ArrayList<>();
-    String[] files = this.settings.get("requestMessageFile").split(","); // TODO use ConnectorConfig class
-    final int tasks = Math.min(maxTasks, files.length);
-
-    for (int i = 0; i < tasks; i++) {
-      Map<String, String> taskConfig = new HashMap<>(settings);
-      for (int j = i; j < files.length; j = j + tasks) { // distribute files round-robin
-        taskConfig.put("requestMessageFile", files[j].trim()); // TODO use TaskConfig class
+   if (!this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
+      List<String> files = this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES);
+      final int tasks = Math.min(maxTasks, files.size());
+      for (int i = 0; i < tasks; i++) {
+        Map<String, String> taskConfig = new HashMap<>(settings); // TODO Cleanup unused params instead of copying all.
+        for (int j = i; j < files.size(); j = j + tasks) {            // distribute files round-robin
+          taskConfig.put(SoapSourceTaskConfig.REQUEST_MSG_FILE, files.get(j));
+        }
+        taskConfigs.add(taskConfig);
       }
-      taskConfigs.add(taskConfig);
+    } else {
+      throw new ConfigException("No request file provided.");
     }
-
     return taskConfigs;
   }
 

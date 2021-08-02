@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SoapSourceTask extends SourceTask {
 
   private final SourceRecordMapper mapper = new SourceRecordMapper();
-  SoapSourceConnectorConfig config;
+  SoapSourceTaskConfig config;
   SoapClient client = new SoapClient();
   private Long pollInterval;
   private Long connectionTimeout;
@@ -68,23 +68,23 @@ public class SoapSourceTask extends SourceTask {
 
   @Override
   public void start(Map<String, String> map) {
-    config = new SoapSourceConnectorConfig(map);
+    this.config = new SoapSourceTaskConfig(map);
     validateAndsSetConfigVars(config);
     client.start(config);
   }
 
-  private void validateAndsSetConfigVars(SoapSourceConnectorConfig config) {
+  private void validateAndsSetConfigVars(SoapSourceTaskConfig config) {
 
-    pollInterval = Optional.of(config.getLong(SoapSourceConnectorConfig.POLL_INTERVAL))
+    pollInterval = Optional.of(config.getLong(SoapSourceTaskConfig.POLL_INTERVAL))
         .filter(p -> p > 0)
         .orElseThrow(() -> new ConfigException("Poll interval must be greater than 0"));
-    connectionTimeout = Optional.of(config.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT))
+    connectionTimeout = Optional.of(config.getLong(SoapSourceTaskConfig.CONNECTION_TIMEOUT))
         .filter(p -> (p > 0 && p < pollInterval))
         .orElseThrow(() -> new ConfigException("Poll interval must be greater than connection timeout"));
-    topic = Optional.ofNullable(this.config.getString(SoapSourceConnectorConfig.TOPIC))
+    topic = Optional.ofNullable(this.config.getString(SoapSourceTaskConfig.TOPIC))
         .orElseThrow(() -> new ConfigException("Topic can't be null"));
-    request = ConfigUtils.getAbsoluteFile(config, SoapSourceConnectorConfig.REQUEST_MSG_FILE);
-    serviceName = this.config.getString(SoapSourceConnectorConfig.SERVICE_NAME);
+    request = ConfigUtils.getAbsoluteFile(config, SoapSourceTaskConfig.REQUEST_MSG_FILE);
+    serviceName = this.config.getString(SoapSourceTaskConfig.SERVICE_NAME);
   }
 
   @Override

@@ -39,7 +39,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -51,7 +51,7 @@ public class SourceTaskSettingMother {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -62,7 +62,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, KO_POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -76,7 +76,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -88,7 +88,7 @@ public class SourceTaskSettingMother {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -113,7 +113,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, KO_REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, KO_REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -126,7 +126,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -138,7 +138,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -150,7 +150,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -165,7 +165,7 @@ public class SourceTaskSettingMother {
     if (requestfiles > 1) {
       final String[] rf = REQUEST_FILE.split("\\.");
       for (int i = 1; i < requestfiles; i++) {
-        rfs.append(", ").append(rf[0]).append("-").append(i).append("-").append(rf[1]);
+        rfs.append(", ").append(rf[0]).append("-").append(i).append(".").append(rf[1]);
       }
     }
 
@@ -174,7 +174,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, rfs.toString());
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, rfs.toString());
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);

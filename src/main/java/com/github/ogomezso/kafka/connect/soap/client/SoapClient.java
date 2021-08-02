@@ -29,11 +29,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.commons.pool2.impl.GenericObjectPool;
+// import org.apache.commons.pool2.impl.GenericObjectPool;
 
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
 
+import com.github.ogomezso.kafka.connect.soap.source.SoapSourceTaskConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType;
@@ -61,18 +62,18 @@ public class SoapClient {
   private Callable<SOAPMessage> task;
 
 
-  public void start(SoapSourceConnectorConfig config) {
+  public void start(SoapSourceTaskConfig config) {
 
-    QName serviceName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
-        config.getString(SoapSourceConnectorConfig.SERVICE_NAME));
-    QName portName = new QName(config.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE),
-        config.getString(SoapSourceConnectorConfig.PORT_NAME));
-    String endpointUrl = config.getString(SoapSourceConnectorConfig.ENDPOINT_URL);
-    String actionUrl = config.getString(SoapSourceConnectorConfig.SOAP_ACTION);
+    QName serviceName = new QName(config.getString(SoapSourceTaskConfig.TARGET_NAMESPACE),
+        config.getString(SoapSourceTaskConfig.SERVICE_NAME));
+    QName portName = new QName(config.getString(SoapSourceTaskConfig.TARGET_NAMESPACE),
+        config.getString(SoapSourceTaskConfig.PORT_NAME));
+    String endpointUrl = config.getString(SoapSourceTaskConfig.ENDPOINT_URL);
+    String actionUrl = config.getString(SoapSourceTaskConfig.SOAP_ACTION);
     File messageFile = ConfigUtils
-        .getAbsoluteFile(config, SoapSourceConnectorConfig.REQUEST_MSG_FILE);
-    Long connectionTimeout = config.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT);
-    Long requestTimeout = config.getLong(SoapSourceConnectorConfig.REQUEST_TIMEOUT);
+        .getAbsoluteFile(config, SoapSourceTaskConfig.REQUEST_MSG_FILE);
+    Long connectionTimeout = config.getLong(SoapSourceTaskConfig.CONNECTION_TIMEOUT);
+    Long requestTimeout = config.getLong(SoapSourceTaskConfig.REQUEST_TIMEOUT);
 
     createCircuitBreakerTask(serviceName, portName, endpointUrl, actionUrl, messageFile, connectionTimeout,
         requestTimeout);

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.Callable;
 
+import com.github.ogomezso.kafka.connect.soap.source.SoapSourceTaskConfig;
 import org.apache.kafka.common.config.ConfigException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ class SoapClientTest {
   private final SoapClient stubbedClassToTest = new SoapClient();
   private final SoapClient classToTest = new SoapClient();
   @Mock
-  private SoapSourceConnectorConfig mockConfig;
+  private SoapSourceTaskConfig mockConfig;
   @Mock
   private Callable<SOAPMessage> mockTask;
   @Mock
@@ -55,14 +56,14 @@ class SoapClientTest {
 
   @Test
   public void given_not_null_config_client_starts() {
-    when(mockConfig.getString(SoapSourceConnectorConfig.ENDPOINT_URL)).thenReturn(URL);
-    when(mockConfig.getString(SoapSourceConnectorConfig.PORT_NAME)).thenReturn(PORT_NAME);
-    when(mockConfig.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILE)).thenReturn(REQUEST_FILE);
-    when(mockConfig.getString(SoapSourceConnectorConfig.SERVICE_NAME)).thenReturn(SERVICE);
-    when(mockConfig.getString(SoapSourceConnectorConfig.SOAP_ACTION)).thenReturn(SOAP_ACTION);
-    when(mockConfig.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE))
+    when(mockConfig.getString(SoapSourceTaskConfig.ENDPOINT_URL)).thenReturn(URL);
+    when(mockConfig.getString(SoapSourceTaskConfig.PORT_NAME)).thenReturn(PORT_NAME);
+    when(mockConfig.getString(SoapSourceTaskConfig.REQUEST_MSG_FILE)).thenReturn(REQUEST_FILE);
+    when(mockConfig.getString(SoapSourceTaskConfig.SERVICE_NAME)).thenReturn(SERVICE);
+    when(mockConfig.getString(SoapSourceTaskConfig.SOAP_ACTION)).thenReturn(SOAP_ACTION);
+    when(mockConfig.getString(SoapSourceTaskConfig.TARGET_NAMESPACE))
         .thenReturn(TARGET_NAME_SPACE);
-    when(mockConfig.getLong(SoapSourceConnectorConfig.CONNECTION_TIMEOUT))
+    when(mockConfig.getLong(SoapSourceTaskConfig.CONNECTION_TIMEOUT))
         .thenReturn(CONNECTION_TIMEOUT);
 
     assertDoesNotThrow(() -> classToTest.start(mockConfig));
@@ -70,13 +71,13 @@ class SoapClientTest {
 
   @Test
   public void given_not_absolute_path_request_file_when_client_starts_then_config_exception_thrown() {
-    when(mockConfig.getString(SoapSourceConnectorConfig.ENDPOINT_URL)).thenReturn(URL);
-    when(mockConfig.getString(SoapSourceConnectorConfig.PORT_NAME)).thenReturn(PORT_NAME);
-    when(mockConfig.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILE))
+    when(mockConfig.getString(SoapSourceTaskConfig.ENDPOINT_URL)).thenReturn(URL);
+    when(mockConfig.getString(SoapSourceTaskConfig.PORT_NAME)).thenReturn(PORT_NAME);
+    when(mockConfig.getString(SoapSourceTaskConfig.REQUEST_MSG_FILE))
         .thenReturn(KO_REQUEST_FILE);
-    when(mockConfig.getString(SoapSourceConnectorConfig.SERVICE_NAME)).thenReturn(SERVICE);
-    when(mockConfig.getString(SoapSourceConnectorConfig.SOAP_ACTION)).thenReturn(SOAP_ACTION);
-    when(mockConfig.getString(SoapSourceConnectorConfig.TARGET_NAMESPACE))
+    when(mockConfig.getString(SoapSourceTaskConfig.SERVICE_NAME)).thenReturn(SERVICE);
+    when(mockConfig.getString(SoapSourceTaskConfig.SOAP_ACTION)).thenReturn(SOAP_ACTION);
+    when(mockConfig.getString(SoapSourceTaskConfig.TARGET_NAMESPACE))
         .thenReturn(TARGET_NAME_SPACE);
 
     assertThrows(ConfigException.class, () -> classToTest.start(mockConfig));
