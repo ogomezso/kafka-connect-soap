@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.github.ogomez.kafka.connect.soap</groupId>
+  <groupId>com.github.ogomezso.kafka.connect.soap</groupId>
   <artifactId>kafka-connect-soap</artifactId>
   <version>1.0-SNAPSHOT</version>
 
@@ -25,18 +25,66 @@
       <artifactId>connect-utils</artifactId>
       <version>0.4.162</version>
     </dependency>
+    <dependency>
+      <groupId>jakarta.xml.ws</groupId>
+      <artifactId>jakarta.xml.ws-api</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>jaxws-rt</artifactId>
+      <version>3.0.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-xml</artifactId>
+      <version>2.10.2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-circuitbreaker</artifactId>
+      <version>1.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.20</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>3.7.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>3.7.7</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <packaging>jar</packaging>
 
   <scm>
-    <connection>scm:git:https://github.com/cjmatta/kafka-connect-sse.git</connection>
-    <developerConnection>scm:git:git@github.com:cjmatta/kafka-connect-sse.git</developerConnection>
-    <url>https://github.com/cjmatta/kafka-connect-sse</url>
+    <connection>scm:git:https://github.com/ogomezso/kafka-connect-soap.git</connection>
+    <developerConnection>scm:git:git@github.com:ogomezso/kafka-connect-soap.git</developerConnection>
+    <url>https://github.com/ogomezso/kafka-connect-soap</url>
   </scm>
   <issueManagement>
     <system>github</system>
-    <url>https://github.com/cjmatta/kafka-connect-sse/issues</url>
+    <url>https://github.com/ogomezso/kafka-connect-soap/issues</url>
   </issueManagement>
 
   <build>
@@ -60,15 +108,14 @@
             </goals>
             <configuration>
               <title>Kafka Connect SSE</title>
-              <documentationUrl>https://github.com/ogomez/kafka-connect-soap/blob/master/README.md</documentationUrl>
+              <documentationUrl>https://github.com/ogomezso/kafka-connect-soap/blob/master/README.md</documentationUrl>
               <description>A Kafka Connect source connector for SOAP Web Services</description>
               <ownerUsername>ogomez</ownerUsername>
               <ownerType>user</ownerType>
               <ownerName>Oscar Gomez</ownerName>
-              <ownerUrl>https://github.com/ogomez</ownerUrl>
-              <supportUrl>https://github.com/ogomez/kafka-connect-soap/issues</supportUrl>
+              <ownerUrl>https://github.com/ogomezso</ownerUrl>
+              <supportUrl>https://github.com/ogomezso/kafka-connect-soap/issues</supportUrl>
               <supportSummary>Support provided through community involvement.</supportSummary>
-<!--              <logo>assets/HTML5_Badge_256.png</logo>-->
               <componentTypes>
                 <componentType>source</componentType>
               </componentTypes>
