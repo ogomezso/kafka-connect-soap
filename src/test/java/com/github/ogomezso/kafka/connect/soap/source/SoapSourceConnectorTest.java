@@ -46,13 +46,40 @@ class SoapSourceConnectorTest {
     assertThrows(ConfigException.class, () -> classToTest.start(testSettings));
   }
 
-  @Test
-  public void given_ok_settings_mask_task_not_1_when_call_task_config_then_throws_config_exception(){
+  private void call_task_config_files_tasks_test(int files, int maxTasks) {
 
-    Map<String, String> testSettings = SourceTaskSettingMother.createValidMockSettings();
+    Map<String, String> testSettings = SourceTaskSettingMother.createValidMultiRequestMockSettings(files);
     classToTest.start(testSettings);
 
-    assertThrows(ConfigException.class, () -> classToTest.taskConfigs(2));
+    List<Map<String, String>> actual = classToTest.taskConfigs(maxTasks);
+
+    assertEquals(Math.min(files, maxTasks), actual.size());
+    actual.forEach(c -> {
+      assertTrue(c.containsKey("requestMessageFile")); // TODO use TaskConfig class
+      assertTrue(c.get("requestMessageFile").matches("\\/[^\\, \\s]+"));
+
+    });
+  }
+
+
+  @Test
+  public void given_multiple_files_settings_1_max_task_when_call_task_config_then_returns_settings_as_list() {
+    call_task_config_files_tasks_test(2, 1);
+  }
+
+  @Test
+  public void given_2_files_settings_3_max_tasks_when_call_task_config_then_returns_settings_as_list() {
+    call_task_config_files_tasks_test(2, 3);
+  }
+
+  @Test
+  public void given_3_files_settings_3_max_tasks_when_call_task_config_then_returns_settings_as_list() {
+    call_task_config_files_tasks_test(3, 3);
+  }
+
+  @Test
+  public void given_10_files_settings_3_max_tasks_when_call_task_config_then_returns_settings_as_list() {
+    call_task_config_files_tasks_test(10, 3);
   }
 
 }

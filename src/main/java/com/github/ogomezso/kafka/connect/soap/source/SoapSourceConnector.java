@@ -16,12 +16,13 @@
 
 package com.github.ogomezso.kafka.connect.soap.source;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.kafka.common.config.ConfigDef;
-import org.apache.kafka.common.config.ConfigException;
+//import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.source.SourceConnector;
 
@@ -38,11 +39,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SoapSourceConnector extends SourceConnector {
 
   Map<String, String> settings;
+  SoapSourceConnectorConfig config;
 
   @Override
   public void start(Map<String, String> map) {
     log.info("Starting Server Sent Events Source Connector");
-    SoapSourceConnectorConfig config = new SoapSourceConnectorConfig(map);
+    this.config = new SoapSourceConnectorConfig(map);
     this.settings = map;
   }
 
@@ -56,12 +58,24 @@ public class SoapSourceConnector extends SourceConnector {
     //TODO Allow a list of request files.
     // Every task will receive one file as config.
     // Every request must be handled by its own task so max tasks must be the number of request records.
-    if (maxTasks != 1) {
-      throw new ConfigException("Task must be exactly one");
+    //   if (maxTasks != 1) {
+    //     throw new ConfigException("Task must be exactly one");
+    //   }
+
+    // Separate Task Config from Source Config.
+    ArrayList<Map<String, String>> taskConfigs = new ArrayList<>();
+    String[] files = this.settings.get("requestMessageFile").split(","); // TODO use ConnectorConfig class
+    final int tasks = Math.min(maxTasks, files.length);
+
+    for (int i = 0; i < tasks; i++) {
+      Map<String, String> taskConfig = new HashMap<>(settings);
+      for (int j = i; j < files.length; j = j + tasks) { // distribute files round-robin
+        taskConfig.put("requestMessageFile", files[j].trim()); // TODO use TaskConfig class
+      }
+      taskConfigs.add(taskConfig);
     }
 
-    //TODO Separate Task Config from Source Config. For the moment is exactly the same so don't do now.
-    return Collections.singletonList(settings);
+    return taskConfigs;
   }
 
   @Override
