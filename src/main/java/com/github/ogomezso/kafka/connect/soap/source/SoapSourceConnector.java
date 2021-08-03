@@ -16,8 +16,7 @@
 
 package com.github.ogomezso.kafka.connect.soap.source;
 
-import java.io.File;
-import java.util.*;
+
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
@@ -28,8 +27,12 @@ import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
 
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Description("Kafka Connect source connector for SOAP Services")
 @Title("Kafka Connect SOAP")
@@ -57,7 +60,7 @@ public class SoapSourceConnector extends SourceConnector {
     // Every request must be handled by its own task so max tasks must be the number of request records.
 
     ArrayList<Map<String, String>> taskConfigs = new ArrayList<>();
-   if (!this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
+    if (!this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
       List<String> files = this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES);
       final int tasks = Math.min(maxTasks, files.size());
       for (int i = 0; i < tasks; i++) {

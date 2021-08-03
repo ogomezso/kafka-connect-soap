@@ -29,10 +29,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-// import org.apache.commons.pool2.impl.GenericObjectPool;
-
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
-import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
 
 import com.github.ogomezso.kafka.connect.soap.source.SoapSourceTaskConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;

@@ -16,7 +16,6 @@ package com.github.ogomezso.kafka.connect.soap.source;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

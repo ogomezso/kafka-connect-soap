@@ -24,7 +24,6 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigDef.Importance;
 import org.apache.kafka.common.config.ConfigDef.Type;
 
-import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 import org.apache.kafka.common.config.ConfigException;
 
 public class SoapSourceConnectorConfig extends AbstractConfig {
@@ -33,7 +32,6 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
   public static final String ENDPOINT_URL = "endpointUrl";
   public static final String POLL_INTERVAL = "pollInterval";
   public static final String PORT_NAME = "portName";
-//  public static final String REQUEST_MSG_FILE = "requestMessageFile";
   public static final String REQUEST_MSG_FILES = "requestMessageFiles";
   public static final String REQUEST_TIMEOUT = "requestTimeOut";
   public static final String SERVICE_NAME = "serviceName";
@@ -57,7 +55,6 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
   private final String endpointUrl;
   private final String portName;
   private final Long pollIntervalSeconds;
- // private final File requestMsgFile;
   private final List<File> requestMsgFiles;
   private final Long requestTimeout;
   private final String serviceName;
@@ -72,7 +69,6 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
     portName = this.getString(PORT_NAME);
     pollIntervalSeconds = this.getLong(POLL_INTERVAL);
     requestMsgFiles = new ArrayList<>();
-   // requestMsgFile = ConfigUtils.getAbsoluteFile(this, REQUEST_MSG_FILE);
 
     for (String f : originals.get("requestMessageFiles").toString().split(",")) {
       File file = new File(f.trim());
@@ -100,7 +96,6 @@ public class SoapSourceConnectorConfig extends AbstractConfig {
         .define(ENDPOINT_URL, Type.STRING, Importance.HIGH, ENDPOINT_URL_DOC)
         .define(PORT_NAME, Type.STRING, Importance.HIGH, PORT_NAME_DOC)
         .define(POLL_INTERVAL, Type.LONG, 60, Importance.HIGH, POLL_INTERVAL_DOC)
-    //    .define(REQUEST_MSG_FILE, Type.STRING, "none", Importance.HIGH, REQUEST_MSG_FILE_DOC)
         .define(REQUEST_MSG_FILES, Type.LIST, Importance.HIGH, REQUEST_MSG_FILES_DOC) // TODO doc
         .define(REQUEST_TIMEOUT, Type.LONG, 30000, Importance.LOW, REQUEST_TIMEOUT_DOC)
         .define(SERVICE_NAME, Type.STRING, Importance.HIGH, SERVICE_NAME_DOC)

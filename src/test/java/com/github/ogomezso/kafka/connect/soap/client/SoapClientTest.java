@@ -28,8 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnectorConfig;
-
 import jakarta.xml.soap.SOAPMessage;
 
 @ExtendWith(MockitoExtension.class)

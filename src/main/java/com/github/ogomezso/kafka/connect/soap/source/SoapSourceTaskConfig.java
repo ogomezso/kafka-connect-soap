@@ -77,7 +77,7 @@ public class SoapSourceTaskConfig extends AbstractConfig {
         .define(CONNECTION_TIMEOUT, Type.LONG, 30000, Importance.MEDIUM, CONNECTION_TIMEOUT_DOC)
         .define(ENDPOINT_URL, Type.STRING, Importance.HIGH, ENDPOINT_URL_DOC)
         .define(PORT_NAME, Type.STRING, Importance.HIGH, PORT_NAME_DOC)
-        .define(POLL_INTERVAL, Type.LONG, 60, Importance.HIGH, POLL_INTERVAL_DOC)
+        .define(POLL_INTERVAL, Type.LONG, 6000, Importance.HIGH, POLL_INTERVAL_DOC)
         .define(REQUEST_MSG_FILE, Type.STRING, Importance.HIGH, REQUEST_MSG_FILE_DOC)
         .define(REQUEST_TIMEOUT, Type.LONG, 30000, Importance.LOW, REQUEST_TIMEOUT_DOC)
         .define(SERVICE_NAME, Type.STRING, Importance.HIGH, SERVICE_NAME_DOC)
