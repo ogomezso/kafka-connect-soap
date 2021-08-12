@@ -30,6 +30,7 @@ import com.github.jcustenborder.kafka.connect.utils.config.Title;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class SoapSourceConnector extends SourceConnector {
   @Override
   public void start(Map<String, String> map) {
     log.info("Starting Server Sent Events Source Connector");
-    this.config = new SoapSourceConnectorConfig(map);
+    this.config = new SoapSourceConnectorConfig(SoapSourceConnectorConfig.config(), map);
     this.settings = map;
   }
 
@@ -56,18 +57,35 @@ public class SoapSourceConnector extends SourceConnector {
 
   @Override
   public List<Map<String, String>> taskConfigs(int maxTasks) {
-    // Every task will receive one file as config.
-    // Every request must be handled by its own task so max tasks must be the number of request records.
-
     ArrayList<Map<String, String>> taskConfigs = new ArrayList<>();
-    if (!this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
-      List<String> files = this.config.getList(SoapSourceConnectorConfig.REQUEST_MSG_FILES);
-      final int tasks = Math.min(maxTasks, files.size());
+    if (!this.config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
+      String[] files = this.config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILES).split(",");
+      String[] topics = this.config.getString(SoapSourceConnectorConfig.TOPIC).split(",");
+      Arrays.setAll(files, i -> files[i].trim());
+      Arrays.setAll(topics, i -> topics[i].trim());
+
+      final int tasks = Math.min(maxTasks, files.length); // determine the actual no of tasks
+
       for (int i = 0; i < tasks; i++) {
-        Map<String, String> taskConfig = new HashMap<>(settings); // TODO Cleanup unused params instead of copying all.
-        for (int j = i; j < files.size(); j = j + tasks) {            // distribute files round-robin
-          taskConfig.put(SoapSourceTaskConfig.REQUEST_MSG_FILE, files.get(j));
+        Map<String, String> taskConfig = new HashMap<>(settings);
+        StringBuilder taskFiles = new StringBuilder();
+        StringBuilder taskTopics = new StringBuilder();
+        for (int j = i; j < files.length; j = j + tasks) {            // distribute files (& topics) round-robin
+          taskFiles
+              .append(taskFiles.length() == 0 ? "" : ", ")
+              .append(files[j]);
+          if (topics.length > 1) {
+            assert files.length == topics.length; // should always be true at this point
+            taskTopics
+                .append(taskTopics.length() == 0 ? "" : ", ")
+                .append(topics[j]);
+          }
         }
+
+        taskConfig.put(SoapSourceTaskConfig.REQUEST_MSG_FILES, taskFiles.toString());
+        if (taskTopics.length() > 0)
+          taskConfig.put(SoapSourceTaskConfig.TOPIC,  taskTopics.toString());
+
         taskConfigs.add(taskConfig);
       }
     } else {
