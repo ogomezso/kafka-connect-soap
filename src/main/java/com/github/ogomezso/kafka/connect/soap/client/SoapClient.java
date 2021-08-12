@@ -31,7 +31,6 @@ import java.util.concurrent.TimeoutException;
 
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
 
-import com.github.ogomezso.kafka.connect.soap.source.SoapSourceTaskConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType;
@@ -48,6 +47,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SoapClient {
 
+  private SoapClientConfig config;
+
+  public SoapClientConfig getConfig() {
+    return config;
+  }
 
   private static final int MAX_CORES_USED = Optional
       .of(Runtime.getRuntime().availableProcessors() / 2)
@@ -58,20 +62,19 @@ public class SoapClient {
 
   private Callable<SOAPMessage> task;
 
+  public void start(SoapClientConfig config) {
+    this.config = config;
 
-  public void start(SoapSourceTaskConfig config) {
-
-    QName serviceName = new QName(config.getString(SoapSourceTaskConfig.TARGET_NAMESPACE),
-        config.getString(SoapSourceTaskConfig.SERVICE_NAME));
-    QName portName = new QName(config.getString(SoapSourceTaskConfig.TARGET_NAMESPACE),
-        config.getString(SoapSourceTaskConfig.PORT_NAME));
-    String endpointUrl = config.getString(SoapSourceTaskConfig.ENDPOINT_URL);
-    String actionUrl = config.getString(SoapSourceTaskConfig.SOAP_ACTION);
+    QName serviceName = new QName(config.getString(SoapClientConfig.TARGET_NAMESPACE),
+        config.getString(SoapClientConfig.SERVICE_NAME));
+    QName portName = new QName(config.getString(SoapClientConfig.TARGET_NAMESPACE),
+        config.getString(SoapClientConfig.PORT_NAME));
+    String endpointUrl = config.getString(SoapClientConfig.ENDPOINT_URL);
+    String actionUrl = config.getString(SoapClientConfig.SOAP_ACTION);
     File messageFile = ConfigUtils
-        .getAbsoluteFile(config, SoapSourceTaskConfig.REQUEST_MSG_FILE);
-    Long connectionTimeout = config.getLong(SoapSourceTaskConfig.CONNECTION_TIMEOUT);
-    Long requestTimeout = config.getLong(SoapSourceTaskConfig.REQUEST_TIMEOUT);
-
+        .getAbsoluteFile(config, SoapClientConfig.REQUEST_MSG_FILE);
+    Long connectionTimeout = config.getLong(SoapClientConfig.CONNECTION_TIMEOUT);
+    Long requestTimeout = config.getLong(SoapClientConfig.REQUEST_TIMEOUT);
     createCircuitBreakerTask(serviceName, portName, endpointUrl, actionUrl, messageFile, connectionTimeout,
         requestTimeout);
   }
@@ -108,7 +111,7 @@ public class SoapClient {
         .schedule(task, pollInterval,
             TimeUnit.MILLISECONDS);
 
-    log.debug("invonking at: " + LocalDateTime.now());
+    log.debug("invoking at: " + LocalDateTime.now());
     SOAPMessage result = future
         .get(pollInterval + 5000L,
             TimeUnit.MILLISECONDS);

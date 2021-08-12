@@ -25,6 +25,8 @@ Then to start the connector just run ```./post-source-connector.sh```
 To check all is working run a console consumer into kafka container
 
 ```
-docker compose exec kafka /bin/bash
-kafka-console-consumer --bootstrap-server localhost:9092 --topic soap.test
+$ docker compose exec kafka /bin/bash
+curl -s http://localhost:8083/connectors/soap-country-source/tasks | jq
+kafka-topics --bootstrap-server localhost:9092 --list | grep soap
+kafka-console-consumer --bootstrap-server localhost:9092 --topic soap.countries.getCountryRequest.xml
 ```
