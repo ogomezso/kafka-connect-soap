@@ -16,9 +16,7 @@
 
 package com.github.ogomezso.kafka.connect.soap.source;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
 
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.common.config.ConfigException;
@@ -29,8 +27,13 @@ import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
 
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Description("Kafka Connect source connector for SOAP Services")
 @Title("Kafka Connect SOAP")
@@ -38,11 +41,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SoapSourceConnector extends SourceConnector {
 
   Map<String, String> settings;
+  SoapSourceConnectorConfig config;
 
   @Override
   public void start(Map<String, String> map) {
     log.info("Starting Server Sent Events Source Connector");
-    SoapSourceConnectorConfig config = new SoapSourceConnectorConfig(map);
+    this.config = new SoapSourceConnectorConfig(SoapSourceConnectorConfig.config(), map);
     this.settings = map;
   }
 
@@ -53,15 +57,41 @@ public class SoapSourceConnector extends SourceConnector {
 
   @Override
   public List<Map<String, String>> taskConfigs(int maxTasks) {
-    //TODO Allow a list of request files.
-    // Every task will receive one file as config.
-    // Every request must be handled by its own task so max tasks must be the number of request records.
-    if (maxTasks != 1) {
-      throw new ConfigException("Task must be exactly one");
-    }
+    ArrayList<Map<String, String>> taskConfigs = new ArrayList<>();
+    if (!this.config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILES).isEmpty()) {
+      String[] files = this.config.getString(SoapSourceConnectorConfig.REQUEST_MSG_FILES).split(",");
+      String[] topics = this.config.getString(SoapSourceConnectorConfig.TOPIC).split(",");
+      Arrays.setAll(files, i -> files[i].trim());
+      Arrays.setAll(topics, i -> topics[i].trim());
 
-    //TODO Separate Task Config from Source Config. For the moment is exactly the same so don't do now.
-    return Collections.singletonList(settings);
+      final int tasks = Math.min(maxTasks, files.length); // determine the actual no of tasks
+
+      for (int i = 0; i < tasks; i++) {
+        Map<String, String> taskConfig = new HashMap<>(settings);
+        StringBuilder taskFiles = new StringBuilder();
+        StringBuilder taskTopics = new StringBuilder();
+        for (int j = i; j < files.length; j = j + tasks) {            // distribute files (& topics) round-robin
+          taskFiles
+              .append(taskFiles.length() == 0 ? "" : ", ")
+              .append(files[j]);
+          if (topics.length > 1) {
+            assert files.length == topics.length; // should always be true at this point
+            taskTopics
+                .append(taskTopics.length() == 0 ? "" : ", ")
+                .append(topics[j]);
+          }
+        }
+
+        taskConfig.put(SoapSourceTaskConfig.REQUEST_MSG_FILES, taskFiles.toString());
+        if (taskTopics.length() > 0)
+          taskConfig.put(SoapSourceTaskConfig.TOPIC,  taskTopics.toString());
+
+        taskConfigs.add(taskConfig);
+      }
+    } else {
+      throw new ConfigException("No request file provided.");
+    }
+    return taskConfigs;
   }
 
   @Override

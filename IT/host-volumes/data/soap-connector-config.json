@@ -2,13 +2,15 @@
   "name": "soap-country-source",
   "config": {
     "connector.class": "com.github.ogomezso.kafka.connect.soap.source.SoapSourceConnector",
-    "tasks.max": 1,
+    "tasks.max": 2,
     "endpointUrl": "http://wiremock:8080/mockCountries",
-    "pollTime": 20,
+    "pollInterval": 5000,
+    "connectionTimeOut": 3000,
     "portName": "CountriesPortSoap11",
-    "requestMessageFile": "/home/appuser/data/getCountryRequest.xml",
+    "requestMessageFiles": "/home/appuser/data/getCountryRequest.xml, /home/appuser/data/getCountryRequest-ger.xml",
     "serviceName": "CountriesPortService",
     "targetNameSpace": "http://www.baeldung.com/springsoap/gen",
-    "topic": "soap.test"
+    "topicPrefix": "soap.",
+    "topic": "countries."
   }
 }

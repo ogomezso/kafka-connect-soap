@@ -15,15 +15,10 @@
   -->
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:gen="http://www.baeldung.com/springsoap/gen">
-  <soapenv:Header/>
-  <soapenv:Body>
-    <gen:getCountryResponse>
-      <gen:country>
-        <gen:name>Spain</gen:name>
-        <gen:population>46940000</gen:population>
-        <gen:capital>Madrid</gen:capital>
-        <gen:currency>EUR</gen:currency>
-      </gen:country>
-    </gen:getCountryResponse>
-  </soapenv:Body>
+    <soapenv:Header/>
+    <soapenv:Body>
+        <gen:getCountryRequest>
+            <gen:name>Germany</gen:name>
+        </gen:getCountryRequest>
+    </soapenv:Body>
 </soapenv:Envelope>

@@ -22,6 +22,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd "${DIR}/.." || exit
 mvn clean install || exit
 
+rm -rf ${DIR}/host-volumes/connectors && mkdir ${DIR}/host-volumes/connectors
 cp ${DIR}/../target/*.tar.gz ${DIR}/host-volumes/connectors
 cd ${DIR}/host-volumes/connectors/ || exit
 tar -xf *.tar.gz || exit

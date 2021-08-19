@@ -39,7 +39,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -51,7 +51,7 @@ public class SourceTaskSettingMother {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -62,7 +62,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, KO_POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -76,7 +76,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -88,7 +88,7 @@ public class SourceTaskSettingMother {
     return new HashMap<String, String>() {{
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -113,7 +113,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, KO_REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, KO_REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
@@ -126,7 +126,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -138,7 +138,7 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TOPIC, TOPIC);
@@ -150,11 +150,45 @@ public class SourceTaskSettingMother {
       put(SoapSourceConnectorConfig.ENDPOINT_URL, URL);
       put(SoapSourceConnectorConfig.POLL_INTERVAL, POLL_INTERVAL);
       put(SoapSourceConnectorConfig.PORT_NAME, PORT_NAME);
-      put(SoapSourceConnectorConfig.REQUEST_MSG_FILE, REQUEST_FILE);
+      put(SoapSourceConnectorConfig.REQUEST_MSG_FILES, REQUEST_FILE);
       put(SoapSourceConnectorConfig.SERVICE_NAME, SERVICE);
       put(SoapSourceConnectorConfig.SOAP_ACTION, SOAP_ACTION);
       put(SoapSourceConnectorConfig.TARGET_NAMESPACE, TARGET_NAME_SPACE);
     }};
   }
 
+  static Map<String, String> createValidMultiRequestMockSettings(int requestfiles, String assignmentStrategy) {
+
+    Map<String, String> settings = createValidMockSettings();
+
+    StringBuilder rfiles = new StringBuilder(REQUEST_FILE);
+    StringBuilder topics = new StringBuilder(TOPIC);
+    if (requestfiles > 1) {
+      final String[] rfile = REQUEST_FILE.split("\\.");
+      for (int i = 2; i <= requestfiles; i++) {
+        rfiles.append(", ").append(rfile[0]).append("-").append(i).append(".").append(rfile[1]);
+        topics.append(", ").append(TOPIC).append("-").append(i);
+      }
+    }
+
+    if (!assignmentStrategy.isEmpty())
+      settings.put(AbstractSoapSourceConfig.REQUEST_TOPIC_ASSIGNMENT, assignmentStrategy);
+    settings.put(AbstractSoapSourceConfig.REQUEST_MSG_FILES, rfiles.toString());
+    settings.put(AbstractSoapSourceConfig.TOPIC,
+        (assignmentStrategy.equals("CUSTOM_ASSIGNMENT")) ? topics.toString() : TOPIC);
+
+    return settings;
+  }
+
+  static Map<String, String> createValidMultiRequestMockSettings(int requestfiles) {
+    return createValidMultiRequestMockSettings(requestfiles, "");
+  }
+
+  static Map<String, String> createValidMultiRequestMockTaskSettings(int requestfiles, String assignmentStrategy) {
+    return createValidMultiRequestMockSettings(requestfiles, assignmentStrategy);
+  }
+
+  static Map<String, String> createValidMultiRequestMockTaskSettings(int requestfiles) {
+    return createValidMultiRequestMockTaskSettings(requestfiles, "");
+  }
 }
