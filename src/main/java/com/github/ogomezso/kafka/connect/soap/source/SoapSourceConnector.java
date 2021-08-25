@@ -40,14 +40,12 @@ import java.util.Map;
 @Slf4j
 public class SoapSourceConnector extends SourceConnector {
 
-  Map<String, String> settings;
   SoapSourceConnectorConfig config;
 
   @Override
   public void start(Map<String, String> map) {
     log.info("Starting Server Sent Events Source Connector");
     this.config = new SoapSourceConnectorConfig(SoapSourceConnectorConfig.config(), map);
-    this.settings = map;
   }
 
   @Override
@@ -63,11 +61,15 @@ public class SoapSourceConnector extends SourceConnector {
       String[] topics = this.config.getString(SoapSourceConnectorConfig.TOPIC).split(",");
       Arrays.setAll(files, i -> files[i].trim());
       Arrays.setAll(topics, i -> topics[i].trim());
+      if (topics.length != 1 & files.length != topics.length) {
+        throw new ConfigException("Invalid number of topics specified (" + topics.length + "); expected either one topic or "
+                                      + "matching amount of request files (" + files.length + ")");
+      }
 
       final int tasks = Math.min(maxTasks, files.length); // determine the actual no of tasks
 
       for (int i = 0; i < tasks; i++) {
-        Map<String, String> taskConfig = new HashMap<>(settings);
+        Map<String, String> taskConfig = new HashMap<>(config.originalsStrings());
         StringBuilder taskFiles = new StringBuilder();
         StringBuilder taskTopics = new StringBuilder();
         for (int j = i; j < files.length; j = j + tasks) {            // distribute files (& topics) round-robin
@@ -75,7 +77,6 @@ public class SoapSourceConnector extends SourceConnector {
               .append(taskFiles.length() == 0 ? "" : ", ")
               .append(files[j]);
           if (topics.length > 1) {
-            assert files.length == topics.length; // should always be true at this point
             taskTopics
                 .append(taskTopics.length() == 0 ? "" : ", ")
                 .append(topics[j]);
