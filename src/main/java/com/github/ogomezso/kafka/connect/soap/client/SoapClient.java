@@ -14,6 +14,20 @@
 
 package com.github.ogomezso.kafka.connect.soap.client;
 
+import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPException;
+import jakarta.xml.soap.SOAPMessage;
+import jakarta.xml.soap.SOAPPart;
+import jakarta.xml.ws.Dispatch;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.soap.SOAPBinding;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
@@ -29,21 +43,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.github.jcustenborder.kafka.connect.utils.config.ConfigUtils;
-
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig.SlidingWindowType;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import jakarta.xml.soap.MessageFactory;
-import jakarta.xml.soap.SOAPException;
-import jakarta.xml.soap.SOAPMessage;
-import jakarta.xml.soap.SOAPPart;
-import jakarta.xml.ws.Dispatch;
-import jakarta.xml.ws.Service;
-import jakarta.xml.ws.soap.SOAPBinding;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class SoapClient {
 
@@ -53,10 +52,7 @@ public class SoapClient {
     return config;
   }
 
-  private static final int MAX_CORES_USED = Optional
-      .of(Runtime.getRuntime().availableProcessors() / 2)
-      .filter(cores -> !cores.equals(0))
-      .orElse(1);
+  private static final int MAX_CORES_USED = 1; // client must be single-threaded, see https://docs.confluent.io/platform/current/streams/architecture.html#threading-model
   private final ScheduledExecutorService executor = Executors
       .newScheduledThreadPool(MAX_CORES_USED);
 
