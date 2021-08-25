@@ -10,8 +10,7 @@
     "requestMessageFiles": "/home/appuser/data/getCountryRequest.xml, /home/appuser/data/getCountryRequest-ger.xml",
     "serviceName": "CountriesPortService",
     "targetNameSpace": "http://www.baeldung.com/springsoap/gen",
-    "requestTopicAssignment": "ONE_TOPIC",
     "topicPrefix": "soap.",
-    "topic": "countries"
+    "topic": "countries."
   }
 }
